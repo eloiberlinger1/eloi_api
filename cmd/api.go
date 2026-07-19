@@ -6,9 +6,8 @@ import (
 	"net/http"
 	"time"
 
-	repo "ecom-local/internal/adapters/postgresql/sqlc"
+	"ecom-local/internal/json"
 	"ecom-local/internal/orders"
-	"ecom-local/internal/products"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -50,11 +49,24 @@ func (app *application) mount() http.Handler {
 		w.Write([]byte("All good"))
 	})
 
-	productsService := products.NewService(repo.New(app.db))
-	productsHandler := products.NewHandler(productsService)
+	r.Get("/infos", func(w http.ResponseWriter, r *http.Request) {
 
-	r.Get("/products", productsHandler.ListProducts)
-	r.Get("/product/{id}", productsHandler.ListProductById)
+		ip := r.RemoteAddr
+		userAgent := r.UserAgent()
+
+		if ip == "::1" {
+			ip = "127.0.0.1 (Localhost)"
+		}
+
+		response := map[string]string{
+			"ip":         ip,
+			"user_agent": userAgent,
+			"message":    "Welcome to Eloi's API !",
+		}
+
+		json.Write(w, http.StatusOK, response)
+
+	})
 
 	ordersHandler := orders.NewHandler(nil)
 	r.Post("/orders", ordersHandler.CreateOrder)
