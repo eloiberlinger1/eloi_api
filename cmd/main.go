@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+
+	"ecom-local/internal/env"
 )
 
 func main() {
@@ -20,7 +22,7 @@ func main() {
 	}
 
 	cfg := config{
-		addr: ":8080",
+		addr: ":" + env.GetString("PORT", "8080"),
 	}
 
 	app := application{
