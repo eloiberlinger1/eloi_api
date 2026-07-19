@@ -44,6 +44,31 @@ func (app *application) mount() http.Handler {
 	// processing should be stopped.
 	r.Use(middleware.Timeout(60 * time.Second))
 
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		response := map[string]any{
+			"message": "Welcome to Eloi's API!",
+			"version": "1.0.0",
+			"endpoints": []map[string]string{
+				{
+					"path":        "/",
+					"method":      "GET",
+					"description": "API entrypoint, lists available endpoints",
+				},
+				{
+					"path":        "/health",
+					"method":      "GET",
+					"description": "Health check endpoint",
+				},
+				{
+					"path":        "/infos",
+					"method":      "GET",
+					"description": "Information about the client connection and API static data",
+				},
+			},
+		}
+		json.Write(w, http.StatusOK, response)
+	})
+
 	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("All good"))
 	})
