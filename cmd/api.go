@@ -4,30 +4,29 @@ import (
 	"log"
 	"log/slog"
 	"net/http"
+	"strings"
 	"time"
 
 	"ecom-local/internal/json"
-	"ecom-local/internal/orders"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/jackc/pgx/v5"
 	slogchi "github.com/samber/slog-chi"
 )
 
 type config struct {
 	addr string
-	db   dbConfig
-}
-
-type dbConfig struct {
-	dsn string
 }
 
 type application struct {
 	config config
-	// logger
-	db *pgx.Conn
+	data   StaticData
+}
+
+type StaticData struct {
+	BirthDate time.Time `json:"birth_date"`
+	Name      string    `json:"name"`
+	Bio       string    `json:"bio"`
 }
 
 func (app *application) mount() http.Handler {
@@ -54,7 +53,7 @@ func (app *application) mount() http.Handler {
 		ip := r.RemoteAddr
 		userAgent := r.UserAgent()
 
-		if ip == "::1" {
+		if strings.Contains(ip, "::1") {
 			ip = "127.0.0.1 (Localhost)"
 		}
 
@@ -67,9 +66,6 @@ func (app *application) mount() http.Handler {
 		json.Write(w, http.StatusOK, response)
 
 	})
-
-	ordersHandler := orders.NewHandler(nil)
-	r.Post("/orders", ordersHandler.CreateOrder)
 
 	return r
 }
