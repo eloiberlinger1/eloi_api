@@ -38,7 +38,7 @@ func RateLimiter(next http.Handler) http.Handler {
 
 		if c.count >= 5 {
 			mu.Unlock()
-			http.Error(w, "Trop de requêtes. Veuillez réessayer plus tard.", http.StatusTooManyRequests)
+			http.Error(w, "Too many requests. Please try again later.", http.StatusTooManyRequests)
 			return
 		}
 

@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strings"
 	"time"
-
 	"ecom-local/internal/json"
+	appmiddleware "ecom-local/internal/middleware"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -35,7 +35,7 @@ func (app *application) mount() http.Handler {
 
 	// A good base middleware stack
 	r.Use(middleware.RequestID)
-	r.Use(middleware.RealIP)
+	r.Use(appmiddleware.RealIP)
 	r.Use(slogchi.New(slog.Default()))
 	r.Use(middleware.Recoverer)
 
