@@ -64,6 +64,11 @@ func (app *application) mount() http.Handler {
 					"method":      "GET",
 					"description": "Information about the client connection and API static data",
 				},
+				{
+					"path":        "/myip",
+					"method":      "GET",
+					"description": "Returns your IP address",
+				},
 			},
 		}
 		json.Write(w, http.StatusOK, response)
@@ -71,6 +76,22 @@ func (app *application) mount() http.Handler {
 
 	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("All good"))
+	})
+
+	r.Get("/myip", func(w http.ResponseWriter, r *http.Request) {
+
+		ip := r.RemoteAddr
+
+		if strings.Contains(ip, "::1") {
+			ip = "127.0.0.1 (Localhost)"
+		}
+
+		response := map[string]string{
+			"ip": ip,
+		}
+
+		json.Write(w, http.StatusOK, response)
+
 	})
 
 	r.Get("/infos", func(w http.ResponseWriter, r *http.Request) {
